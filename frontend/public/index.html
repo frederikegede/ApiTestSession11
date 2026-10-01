@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173c31">
+  <title>Atlas · Kontaktoversigt</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="/" aria-label="Atlas forside"><span class="brand-mark">a</span>atlas<span class="brand-dot">.</span></a>
+    <div class="workspace"><span class="workspace-icon">A</span><div>Dit arbejdsrum<small>Kontaktbibliotek</small></div></div>
+    <p class="nav-label">ARBEJDSRUM</p>
+    <a class="nav-item active" href="#main"><span aria-hidden="true">▦</span> Kontaktoversigt <span id="nav-count" class="nav-count">—</span></a>
+    <div class="sidebar-bottom"><span class="status-dot"></span> Forbundet til dit arbejdsrum<small>Alle dine kontakter. Ét sted.</small></div>
+  </aside>
+  <div class="page">
+    <header class="topbar"><span>Arbejdsrum <span class="breadcrumb">/</span> <strong>Kontaktoversigt</strong></span><span class="user-avatar" aria-label="Arbejdsrum Atlas">A</span></header>
+    <main id="main">
+      <section class="page-heading"><div><p class="eyebrow">DIT NETVÆRK, SAMLET</p><h1>Mennesker bag dataene<span>.</span></h1><p class="subtitle">Find en kontakt, lær dem at kende, og hold overblikket.</p></div><button id="refresh" class="button primary"><span aria-hidden="true">↻</span> Opdater data</button></section>
+      <section class="stats" aria-label="Overblik">
+        <article class="stat"><div><p>Kontakter i alt</p><strong id="total">—</strong><small>Personer i dit kontaktbibliotek</small></div><span class="stat-icon">◎</span></article>
+        <article class="stat"><div><p>Lande repræsenteret</p><strong id="countries">—</strong><small>Et netværk på tværs af grænser</small></div><span class="stat-icon">⊕</span></article>
+        <article class="stat"><div><p>Virksomheder</p><strong id="companies">—</strong><small>Organisationer i dit netværk</small></div><span class="stat-icon">▥</span></article>
+      </section>
+      <section class="directory" aria-labelledby="directory-title">
+        <div class="directory-heading"><div><h2 id="directory-title">Alle kontakter <span id="contact-count" class="count">—</span></h2><p>Et lille overblik. En verden af forbindelser.</p></div><span class="live-label"><span class="status-dot"></span> Live data</span></div>
+        <div class="toolbar"><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Søg efter navn, email eller virksomhed…" aria-label="Søg i kontakter"></label><label class="filter"><span class="sr-only">Filtrer efter land</span><select id="country"><option value="">Alle lande</option></select></label><label class="filter"><span class="sr-only">Sortering</span><select id="sort"><option value="name">Navn: A–Å</option><option value="name-desc">Navn: Å–A</option><option value="company">Virksomhed</option><option value="country">Land</option></select></label></div>
+        <div id="status" class="message" role="status" aria-live="polite">Henter dit kontaktbibliotek…</div>
+        <div id="contacts" class="contact-grid" aria-label="Kontakter"></div>
+        <div class="directory-footer"><span id="result-count" aria-live="polite">Henter kontakter…</span><button id="clear" class="text-button" hidden>Nulstil filtre</button><span class="footer-note">Skabt til et bedre overblik</span></div>
+      </section>
+      <footer class="page-footer"><span>atlas. <span class="muted">Et sted til dine forbindelser.</span></span><span>Kontaktbibliotek</span></footer>
+    </main>
+  </div>
+  <dialog id="detail" aria-labelledby="detail-name"><button id="close-detail" class="close-button" aria-label="Luk kontakt">×</button><div id="detail-content"></div></dialog>
+</body>
+</html>
