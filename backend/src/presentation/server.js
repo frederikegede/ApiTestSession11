@@ -36,33 +36,38 @@ function readJsonBody(req) {
 }
 
 const server = http.createServer(async (req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host}`);
+  try {
+    const url = new URL(req.url, `http://${req.headers.host}`);
 
-  if (req.method === "GET" && url.pathname === "/notes") {
-    return send(res, 200, await notesRepository.findAll());
-  }
-
-  if (req.method === "POST" && url.pathname === "/notes") {
-    let body;
-    try {
-      body = await readJsonBody(req);
-    } catch {
-      return send(res, 400, { error: "Invalid JSON body" });
+    if (req.method === "GET" && url.pathname === "/v1/notes") {
+      return send(res, 200, await notesRepository.findAll());
     }
-    if (!body.title || !body.body) {
-      return send(res, 400, { error: "title and body are required" });
+
+    if (req.method === "POST" && url.pathname === "/v1/notes") {
+      let body;
+      try {
+        body = await readJsonBody(req);
+      } catch {
+        return send(res, 400, { error: "Invalid JSON body" });
+      }
+      if (!body || typeof body.title !== "string" || !body.title || typeof body.body !== "string" || !body.body) {
+        return send(res, 400, { error: "title and body are required" });
+      }
+      const note = await notesRepository.create(body.title, body.body);
+      return send(res, 201, note);
     }
-    const note = await notesRepository.create(body.title, body.body);
-    return send(res, 201, note);
-  }
 
-  const singleNote = url.pathname.match(/^\/notes\/(\d+)$/);
-  if (req.method === "GET" && singleNote) {
-    const note = await notesRepository.findById(Number(singleNote[1]));
-    return note ? send(res, 200, note) : send(res, 404, { error: "Note not found" });
-  }
+    const singleNote = url.pathname.match(/^\/v1\/notes\/(\d+)$/);
+    if (req.method === "GET" && singleNote) {
+      const note = await notesRepository.findById(Number(singleNote[1]));
+      return note ? send(res, 200, note) : send(res, 404, { error: "Note not found" });
+    }
 
-  send(res, 404, { error: "Not found" });
+    send(res, 404, { error: "Not found" });
+  } catch (error) {
+    console.error("Repository request failed:", error);
+    send(res, 502, { error: "Data source unavailable" });
+  }
 });
 
 server.listen(PORT, () => {

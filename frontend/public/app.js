@@ -1,5 +1,5 @@
 // The browser reaches the published backend port, outside Docker's network.
-const BACKEND_URL = "http://10.136.139.51:3000";
+const BACKEND_URL = "http://10.136.138.88:3000";
 const $ = (id) => document.getElementById(id);
 const state = { people: [], loading: false, error: false };
 const collator = new Intl.Collator('da', { sensitivity: 'base' });
@@ -110,7 +110,7 @@ async function loadPeople() {
   $('contacts').setAttribute('aria-busy', 'true');
   render();
   try {
-    const response = await fetch(`${BACKEND_URL}/notes`, { signal: AbortSignal.timeout(15000) });
+    const response = await fetch(`${BACKEND_URL}/v1/notes`, { signal: AbortSignal.timeout(15000) });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
     if (!Array.isArray(data) || !data.every((item) => item && typeof item === 'object' && !Array.isArray(item))) throw new Error('Uventet dataformat');

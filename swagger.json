@@ -1,0 +1,313 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Notes og kontakter API",
+    "version": "1.0.0",
+    "description": "API med versionerede notes-stier. Den aktive repository henter kontakter fra en ekstern test-API. GET returnerer kontaktdata; POST modtager title og body. Oprettelse afhænger af, om den eksterne datakilde understøtter POST."
+  },
+  "servers": [
+    {
+      "url": "http://10.136.138.88:3000",
+      "description": "API på den valgte IP-adresse"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Lokal udvikling"
+    }
+  ],
+  "paths": {
+    "/v1/notes": {
+      "get": {
+        "summary": "Hent alle kontakter",
+        "operationId": "listNotes",
+        "responses": {
+          "200": {
+            "description": "Liste over kontakter fra den aktive datakilde.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Contact"
+                  }
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Datakilden kunne ikke kontaktes eller returnerede et ugyldigt svar.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Data source unavailable"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Opret en note",
+        "operationId": "createNote",
+        "description": "Sender title og body til datakilden. Datakilden er en test-API, så varig lagring er ikke garanteret. En afvist POST giver 502.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNote"
+              },
+              "example": {
+                "title": "Hej",
+                "body": "Min første note"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Datakildens svar på oprettelsen, uden userId. Øvrige felter videresendes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ugyldig JSON eller manglende, tomme eller ikke-strengfelter title/body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalidJson": {
+                    "value": {
+                      "error": "Invalid JSON body"
+                    }
+                  },
+                  "invalidFields": {
+                    "value": {
+                      "error": "title and body are required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Datakilden kunne ikke kontaktes eller returnerede et ugyldigt svar.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Data source unavailable"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/notes/{id}": {
+      "get": {
+        "summary": "Hent én kontakt",
+        "operationId": "getNote",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Kontaktens numeriske ID.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "En kontakt fra datakilden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Contact"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Datakilden fandt ikke kontakten. En sti med et ikke-numerisk ID giver i stedet error: Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Note not found"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Datakilden kunne ikke kontaktes eller returnerede et ugyldigt svar.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Data source unavailable"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Contact": {
+        "type": "object",
+        "description": "Kontaktfelter fra den aktive eksterne datakilde. userId fjernes, og øvrige felter videresendes.",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "ssn": {
+            "type": "string"
+          },
+          "dateOfBirth": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "age": {
+            "type": "integer"
+          },
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "company": {
+            "$ref": "#/components/schemas/Company"
+          }
+        }
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "street": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "zipcode": {
+            "type": "string"
+          },
+          "latitude": {
+            "type": "number"
+          },
+          "longitude": {
+            "type": "number"
+          }
+        }
+      },
+      "Company": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "jobTitle": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateNote": {
+        "type": "object",
+        "required": [
+          "title",
+          "body"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Notens titel."
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Notens tekst."
+          }
+        }
+      },
+      "CreateResult": {
+        "type": "object",
+        "description": "Datakildens JSON-objekt uden userId. id, title og body beskrives, hvis datakilden returnerer dem; andre felter er også tilladt.",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Beskrivelse af fejlen."
+          }
+        }
+      }
+    }
+  }
+}

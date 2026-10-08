@@ -26,15 +26,8 @@ async function findAll() {
 }
 
 async function findById(id) {
-  const response = await fetch(`${BASE_URL}/${id}`);
-  if (response.status === 404) {
-    return null;
-  }
-  if (!response.ok) {
-    throw new Error(`JSONPlaceholder returned ${response.status}`);
-  }
-  const post = await response.json();
-  return stripUserId(post);
+  const contacts = await findAll();
+  return contacts.find((contact) => contact.id === id) || null;
 }
 
 async function create(title, body) {
